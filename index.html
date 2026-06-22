@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Căn Hộ Vinhomes - Mua bán, Cho thuê & Ký gửi</title>
+    <meta name="description" content="Mua bán, cho thuê và ký gửi căn hộ Vinhomes Ocean Park. Cập nhật căn thật, giá thật, hỗ trợ xem nhà nhanh và tư vấn miễn phí.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Căn Hộ Vinhomes - Mua bán, Cho thuê & Ký gửi">
+    <meta property="og:description" content="Mua bán, cho thuê và ký gửi căn hộ Vinhomes Ocean Park. Cập nhật căn thật, giá thật, hỗ trợ xem nhà nhanh và tư vấn miễn phí.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Animated mesh background -->
+    <div class="mesh-bg"></div>
+    <div class="glow-orb glow-orb--1"></div>
+    <div class="glow-orb glow-orb--2"></div>
+
+    <!-- Top Navigation -->
+    <header id="topbar">
+        <div class="topbar__inner">
+            <a href="#/" class="topbar__logo" id="logo">
+                <span class="material-symbols-rounded topbar__logo-icon">home_work</span>
+                <span class="topbar__logo-text">Căn Hộ <span class="topbar__logo-accent">Vinhomes Ocean Park 1</span></span>
+            </a>
+            <nav class="topbar__nav" id="main-nav">
+                <a href="#/" class="topbar__link active" data-page="home" id="nav-home">
+                    <span class="material-symbols-rounded">home</span>
+                    <span>Trang Chủ</span>
+                </a>
+            </nav>
+            <button class="topbar__hamburger" id="hamburger-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile nav overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- Page Content -->
+    <main id="app"></main>
+
+    <!-- Toast stack -->
+    <div id="toasts" aria-live="polite"></div>
+
+    <!-- Lightbox -->
+    <div class="lb" id="lightbox" aria-hidden="true">
+        <button class="lb__close" id="lb-close" aria-label="Đóng">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+        <button class="lb__arrow lb__arrow--prev" id="lb-prev" aria-label="Ảnh trước">
+            <span class="material-symbols-rounded">arrow_back_ios</span>
+        </button>
+        <div class="lb__stage">
+            <img id="lb-img" src="" alt="">
+        </div>
+        <button class="lb__arrow lb__arrow--next" id="lb-next" aria-label="Ảnh sau">
+            <span class="material-symbols-rounded">arrow_forward_ios</span>
+        </button>
+        <div class="lb__dots" id="lb-dots"></div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
