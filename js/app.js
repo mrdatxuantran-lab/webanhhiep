@@ -365,7 +365,7 @@ function renderHome() {
           <p class="welcome-popup__text">📲 Nhắn Zalo ngay để nhận thêm nhiều quỹ căn chưa đăng công khai.</p>
           <p class="welcome-popup__thanks">Cam kết tư vấn nhanh - đúng nhu cầu - miễn phí ✨</p>
           <a href="${contact.zalo || 'https://zalo.me/0123456789'}" target="_blank" class="welcome-popup__btn">
-            <span class="material-symbols-rounded">chat</span> Nhắn Zalo Hiệp
+            <span class="material-symbols-rounded">chat</span> Nhắn Zalo Nhật
           </a>
           <div class="welcome-popup__progress"><div class="welcome-popup__progress-bar"></div></div>
         </div>
