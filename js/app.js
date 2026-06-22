@@ -346,10 +346,17 @@ function renderHome() {
         <div class="welcome-popup">
           <button class="welcome-popup__close" id="welcome-close">&times;</button>
           <div class="welcome-popup__emoji">👋</div>
-          <h2 class="welcome-popup__title">Xin chào mọi người!</h2>
-          <p class="welcome-popup__text">Chào mừng đến với <strong>Phòng Đẹp của Hoàng Văn Hiệp</strong>.</p>
-          <p class="welcome-popup__text">Mọi người tìm kiếm phòng, nếu chưa tìm được như mong muốn hãy nhắn tin cho em Hiệp để nhận nhiều phòng hơn nha.</p>
-          <p class="welcome-popup__thanks">Cám ơn mọi người ❤️</p>
+          <h2 class="welcome-popup__title">Xin chào, chào mừng bạn đến với<br>Quỹ Căn Vinhomes Ocean Park 1</h2>
+          <div class="welcome-popup__list">
+            <p>🏡 <strong>Chuyên cập nhật:</strong></p>
+            <p>✅ Căn hộ cho thuê giá tốt</p>
+            <p>✅ Căn hộ chuyển nhượng chính chủ</p>
+            <p>✅ Quỹ căn ký gửi mới mỗi ngày</p>
+            <p>✅ Hỗ trợ tìm căn theo ngân sách & nhu cầu</p>
+          </div>
+          <p class="welcome-popup__text"><strong>Không thấy căn phù hợp trên website?</strong></p>
+          <p class="welcome-popup__text">📲 Nhắn Zalo ngay để nhận thêm nhiều quỹ căn chưa đăng công khai.</p>
+          <p class="welcome-popup__thanks">Cam kết tư vấn nhanh - đúng nhu cầu - miễn phí ✨</p>
           <a href="${contact.zalo || 'https://zalo.me/0123456789'}" target="_blank" class="welcome-popup__btn">
             <span class="material-symbols-rounded">chat</span> Nhắn Zalo Hiệp
           </a>
