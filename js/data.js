@@ -10,7 +10,8 @@ const STORAGE_KEYS = {
   analytics: 'nhatro_analytics',
 };
 
-const DEFAULT_ADMIN = { username: 'admin', password: 'ab112233' };
+// Password hash (SHA-256 of 'ab112233')
+const ADMIN_HASH = '803f2ef238499fde88428069181232be67730aaba324931ba498789f515cb662';
 
 const DEFAULT_CONTACT = {
   name: 'Chủ nhà',
@@ -368,10 +369,36 @@ export async function saveContactInfo(info) {
 }
 
 // ---------------------------------------------------------------------------
-// Admin Authentication
+// Admin Authentication (SHA-256 hashed + rate limiting)
 // ---------------------------------------------------------------------------
+const _loginState = { attempts: 0, lockedUntil: 0 };
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS = 60000; // 60 seconds
+
+async function _sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export async function verifyAdmin(username, password) {
-  return username === DEFAULT_ADMIN.username && password === DEFAULT_ADMIN.password;
+  // Rate limiting
+  if (Date.now() < _loginState.lockedUntil) {
+    const secs = Math.ceil((_loginState.lockedUntil - Date.now()) / 1000);
+    throw new Error(`Quá nhiều lần thử. Vui lòng đợi ${secs}s`);
+  }
+  const hash = await _sha256(password);
+  const valid = username === 'admin' && hash === ADMIN_HASH;
+  if (!valid) {
+    _loginState.attempts++;
+    if (_loginState.attempts >= MAX_ATTEMPTS) {
+      _loginState.lockedUntil = Date.now() + LOCKOUT_MS;
+      _loginState.attempts = 0;
+      throw new Error('Quá nhiều lần thử. Tài khoản bị khóa 60s');
+    }
+  } else {
+    _loginState.attempts = 0;
+  }
+  return valid;
 }
 
 // ---------------------------------------------------------------------------

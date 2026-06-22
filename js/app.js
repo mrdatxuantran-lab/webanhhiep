@@ -196,18 +196,25 @@ function renderLogin() {
     const password = passwordInput.value.trim();
     if (!password) return;
 
-    const valid = await verifyAdmin('admin', password);
-    if (valid) {
-      setAdminAuthenticated(true);
-      showToast('Đăng nhập thành công!', 'success');
-      renderDashboard();
-    } else {
+    try {
+      const valid = await verifyAdmin('admin', password);
+      if (valid) {
+        setAdminAuthenticated(true);
+        showToast('Đăng nhập thành công!', 'success');
+        renderDashboard();
+      } else {
+        errorEl.textContent = 'Mật khẩu không đúng';
+        errorEl.classList.add('visible');
+        const card = document.querySelector('.auth__card');
+        card.classList.add('shake');
+        setTimeout(() => card.classList.remove('shake'), 500);
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    } catch (err) {
+      errorEl.textContent = err.message;
       errorEl.classList.add('visible');
-      const card = document.querySelector('.auth__card');
-      card.classList.add('shake');
-      setTimeout(() => card.classList.remove('shake'), 500);
       passwordInput.value = '';
-      passwordInput.focus();
     }
   });
 
@@ -587,7 +594,7 @@ function renderCard(room, index) {
     <div class="card animate-in" data-room-id="${room.id}" data-area="${room.area || ''}" data-price="${room.price || 0}" data-address="${room.address || ''}" data-roomtype="${roomType}" data-category="${room.roomCategory || ''}" style="animation-delay:${index * 0.06}s">
       <div class="card__img">
         ${hasImages
-          ? `<img src="${imgSrc}" loading="lazy" alt="${room.title || 'Căn hộ'}">`
+          ? `<img src="${imgSrc}" loading="lazy" decoding="async" alt="${room.title || 'Căn hộ'}">`
           : `<div class="card__placeholder"><span class="material-symbols-rounded">apartment</span></div>`
         }
       </div>
