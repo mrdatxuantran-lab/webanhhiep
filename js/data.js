@@ -10,7 +10,7 @@ const STORAGE_KEYS = {
   analytics: 'nhatro_analytics',
 };
 
-const DEFAULT_ADMIN = { username: 'admin', password: 'admin123' };
+const DEFAULT_ADMIN = { username: 'admin', password: 'ab112233' };
 
 const DEFAULT_CONTACT = {
   name: 'Chủ nhà',
