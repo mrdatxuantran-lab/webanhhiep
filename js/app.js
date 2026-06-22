@@ -318,7 +318,7 @@ function renderHome() {
 
         <div class="cta-banner cta-banner--red">
           <span class="cta-banner__icon"><span class="material-symbols-rounded">support_agent</span></span>
-          <p class="cta-banner__desc">Nếu bạn chưa tìm được phòng phù hợp với nhu cầu, liên hệ trực tiếp với <strong>Hoàng Văn Hiệp</strong> để tìm phòng nhé!</p>
+          <p class="cta-banner__desc">Nếu bạn chưa tìm được phòng phù hợp với nhu cầu, liên hệ trực tiếp với <strong>Phạm Duy Nhật</strong> để tìm phòng nhé!</p>
           <a href="${contact.zalo || 'https://zalo.me/0123456789'}" target="_blank" class="cta-banner__btn-red">
             <span class="material-symbols-rounded">chat</span> Zalo: ${contact.phone || '0123456789'}
           </a>
