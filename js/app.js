@@ -1155,10 +1155,10 @@ function bindDashboardEvents() {
   const selectAllCb = document.getElementById('select-all-rooms');
   const deleteSelectedBtn = document.getElementById('delete-selected-btn');
   const selectedCountEl = document.getElementById('selected-count');
-  const allCheckboxes = () => document.querySelectorAll('.room-select-cb');
+  const allCheckboxes = () => document.querySelectorAll('#admin-room-list .room-select-cb');
 
   function updateSelectedCount() {
-    const checked = document.querySelectorAll('.room-select-cb:checked');
+    const checked = document.querySelectorAll('#admin-room-list .room-select-cb:checked');
     const count = checked.length;
     if (selectedCountEl) selectedCountEl.textContent = count;
     if (deleteSelectedBtn) deleteSelectedBtn.disabled = count === 0;
@@ -1178,7 +1178,7 @@ function bindDashboardEvents() {
 
   if (deleteSelectedBtn) {
     deleteSelectedBtn.addEventListener('click', async () => {
-      const checked = document.querySelectorAll('.room-select-cb:checked');
+      const checked = document.querySelectorAll('#admin-room-list .room-select-cb:checked');
       const ids = Array.from(checked).map(cb => cb.dataset.id);
       if (ids.length === 0) return;
       if (!confirm(`Bạn có chắc chắn muốn xóa ${ids.length} phòng đã chọn?`)) return;
