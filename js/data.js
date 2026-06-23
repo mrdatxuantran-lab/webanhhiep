@@ -56,6 +56,9 @@ function _toDB(room) {
 // initData — ensure tables have initial data
 // ---------------------------------------------------------------------------
 export async function initData() {
+  // Migrate localStorage data to Supabase (one-time)
+  await _migrateFromLocalStorage();
+
   // Check if rooms exist, if not seed sample data
   const { data: rooms, error } = await supabase
     .from('rooms')
@@ -64,6 +67,65 @@ export async function initData() {
 
   if (!error && (!rooms || rooms.length === 0)) {
     await _seedSampleRooms();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Migration: localStorage → Supabase (runs once)
+// ---------------------------------------------------------------------------
+async function _migrateFromLocalStorage() {
+  const MIGRATED_KEY = 'nhatro_migrated_to_supabase';
+  if (localStorage.getItem(MIGRATED_KEY)) return; // Already migrated
+
+  try {
+    // Migrate rooms
+    const roomsRaw = localStorage.getItem('nhatro_rooms');
+    if (roomsRaw) {
+      const localRooms = JSON.parse(roomsRaw);
+      if (Array.isArray(localRooms) && localRooms.length > 0) {
+        const dbRows = localRooms.map(r => ({
+          title: r.title || '',
+          price: Number(r.price) || 0,
+          address: r.address || '',
+          area: r.area || '',
+          room_type: r.roomType || '',
+          room_category: r.roomCategory || '',
+          description: r.description || '',
+          admin_note: r.adminNote || '',
+          move_in_date: r.moveInDate || '',
+          images: r.images || [],
+          videos: r.videos || [],
+        }));
+
+        // Check if Supabase already has rooms (avoid duplicate migration)
+        const { data: existing } = await supabase.from('rooms').select('id').limit(1);
+        if (!existing || existing.length === 0) {
+          await supabase.from('rooms').insert(dbRows);
+          console.log(`Migrated ${dbRows.length} rooms to Supabase`);
+        }
+      }
+    }
+
+    // Migrate contact info
+    const contactRaw = localStorage.getItem('nhatro_contact');
+    if (contactRaw) {
+      const c = JSON.parse(contactRaw);
+      if (c && c.phone) {
+        await supabase.from('contact').upsert({
+          id: 1,
+          name: c.name || 'Chủ nhà',
+          phone: c.phone,
+          zalo: c.zalo || c.phone,
+        });
+        console.log('Migrated contact info to Supabase');
+      }
+    }
+
+    // Mark as migrated
+    localStorage.setItem(MIGRATED_KEY, 'true');
+    console.log('localStorage → Supabase migration complete');
+  } catch (err) {
+    console.error('Migration error:', err);
   }
 }
 
