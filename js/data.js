@@ -106,18 +106,23 @@ async function _migrateFromLocalStorage() {
       }
     }
 
-    // Migrate contact info
+    // Migrate contact info — only if Supabase still has default values
     const contactRaw = localStorage.getItem('nhatro_contact');
     if (contactRaw) {
       const c = JSON.parse(contactRaw);
-      if (c && c.phone) {
-        await supabase.from('contact').upsert({
-          id: 1,
-          name: c.name || 'Chủ nhà',
-          phone: c.phone,
-          zalo: c.zalo || c.phone,
-        });
-        console.log('Migrated contact info to Supabase');
+      // Only migrate if localStorage has REAL data (not default 0123456789)
+      if (c && c.phone && c.phone !== '0123456789') {
+        const { data: existing } = await supabase.from('contact').select('phone').eq('id', 1).single();
+        // Only overwrite if Supabase still has default
+        if (existing && existing.phone === '0123456789') {
+          await supabase.from('contact').upsert({
+            id: 1,
+            name: c.name || 'Chủ nhà',
+            phone: c.phone,
+            zalo: c.zalo || c.phone,
+          });
+          console.log('Migrated contact info to Supabase');
+        }
       }
     }
 

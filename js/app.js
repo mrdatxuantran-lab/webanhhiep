@@ -1053,7 +1053,7 @@ function renderDashboard() {
                   <label class="field__label">Nhắn tin tư vấn (Link Zalo) *</label>
                   <div class="field__input-wrap">
                     <span class="field__icon" style="color:#0068ff"><span class="material-symbols-rounded">chat</span></span>
-                    <input type="url" class="field__input" id="contact-zalo" value="${contact.zalo || ''}" placeholder="VD: https://zalo.me/0912345678" required>
+                    <input type="text" class="field__input" id="contact-zalo" value="${contact.zalo || ''}" placeholder="VD: https://zalo.me/0912345678" required>
                   </div>
                 </div>
                 <div class="form-actions" style="margin-top:20px">
