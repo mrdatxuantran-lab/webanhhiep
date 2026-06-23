@@ -160,9 +160,9 @@ export async function getRoomById(id) {
 }
 
 export async function addRoom(roomData) {
-  // Upload images to Storage if they are base64
-  const images = await _processImages(roomData.images || []);
-  const videos = roomData.videos || [];
+  // Upload images & videos to Storage if they are base64
+  const images = await _processMedia(roomData.images || [], 'rooms');
+  const videos = await _processMedia(roomData.videos || [], 'videos');
 
   const dbData = _toDB({ ...roomData, images, videos });
 
@@ -180,9 +180,9 @@ export async function addRoom(roomData) {
 }
 
 export async function updateRoom(id, roomData) {
-  // Upload new images to Storage if they are base64
-  const images = await _processImages(roomData.images || []);
-  const videos = roomData.videos || [];
+  // Upload new images & videos to Storage if they are base64
+  const images = await _processMedia(roomData.images || [], 'rooms');
+  const videos = await _processMedia(roomData.videos || [], 'videos');
 
   const dbData = _toDB({ ...roomData, images, videos });
 
@@ -201,12 +201,13 @@ export async function updateRoom(id, roomData) {
 }
 
 export async function deleteRoom(id) {
-  // Get room first to delete its images from storage
+  // Get room first to delete its media from storage
   const room = await getRoomById(id);
-  if (room && room.images) {
-    for (const img of room.images) {
-      if (img.includes('room-media')) {
-        const path = img.split('/room-media/')[1];
+  if (room) {
+    const allMedia = [...(room.images || []), ...(room.videos || [])];
+    for (const url of allMedia) {
+      if (url.includes('room-media')) {
+        const path = url.split('/room-media/')[1];
         if (path) {
           await supabase.storage.from('room-media').remove([path]);
         }
@@ -226,31 +227,31 @@ export async function deleteRoom(id) {
 }
 
 // ---------------------------------------------------------------------------
-// Image Processing: upload base64 → Supabase Storage → public URL
+// Media Processing: upload base64/blob → Supabase Storage → public URL
 // ---------------------------------------------------------------------------
-async function _processImages(images) {
+async function _processMedia(items, folder) {
   const result = [];
-  for (const img of images) {
-    if (img.startsWith('data:')) {
-      // Base64 image — upload to Supabase Storage
-      const url = await _uploadBase64(img);
+  for (const item of items) {
+    if (typeof item === 'string' && item.startsWith('data:')) {
+      // Base64 data — upload to Supabase Storage
+      const url = await _uploadBase64(item, folder);
       if (url) result.push(url);
-    } else {
-      // Already a URL (e.g. unsplash)
-      result.push(img);
+    } else if (typeof item === 'string') {
+      // Already a URL
+      result.push(item);
     }
   }
   return result;
 }
 
-async function _uploadBase64(base64Str) {
+async function _uploadBase64(base64Str, folder = 'rooms') {
   try {
     // Extract mime type and data
     const match = base64Str.match(/^data:([^;]+);base64,(.+)$/);
     if (!match) return base64Str;
 
     const mime = match[1];
-    const ext = mime.split('/')[1] || 'jpg';
+    const ext = mime.split('/')[1]?.replace('quicktime', 'mov') || 'bin';
     const byteChars = atob(match[2]);
     const byteNumbers = new Uint8Array(byteChars.length);
     for (let i = 0; i < byteChars.length; i++) {
@@ -259,7 +260,7 @@ async function _uploadBase64(base64Str) {
     const blob = new Blob([byteNumbers], { type: mime });
 
     // Generate unique filename
-    const filename = `rooms/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const filename = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     const { data, error } = await supabase.storage
       .from('room-media')
