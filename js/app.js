@@ -642,6 +642,7 @@ function renderDetail(id) {
     const images = hasImages ? room.images : [];
     const catName = getRoomCategoryName(room.roomCategory);
     const catIcon = getRoomCategoryIcon(room.roomCategory);
+    const isRental = room.roomCategory === 'phongthu';
 
     // Determine video embed
     let videoHTML = '';
@@ -722,7 +723,7 @@ function renderDetail(id) {
           ` : ''}
 
           <div class="detail__price-box">
-            <div class="detail__price">${formatPrice(room.price || 0)} <small>/tháng</small></div>
+            <div class="detail__price">${formatPrice(room.price || 0)}${isRental ? ' <small>/tháng</small>' : ''}</div>
           </div>
 
           <div class="detail__info">
@@ -735,7 +736,7 @@ function renderDetail(id) {
               <span class="detail__info-value">${catName}</span>
             </div>
             <div class="detail__info-item">
-              <span class="detail__info-label"><span class="material-symbols-rounded">payments</span> Giá thuê</span>
+              <span class="detail__info-label"><span class="material-symbols-rounded">payments</span> ${isRental ? 'Giá thuê' : 'Giá bán'}</span>
               <span class="detail__info-value">${formatPrice(room.price || 0)}</span>
             </div>
             <div class="detail__info-item">
