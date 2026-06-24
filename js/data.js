@@ -251,32 +251,43 @@ async function _processMedia(items, folder) {
 
 async function _uploadBase64(base64Str, folder = 'rooms') {
   try {
-    // Extract mime type and data
     const match = base64Str.match(/^data:([^;]+);base64,(.+)$/);
     if (!match) return base64Str;
 
     const mime = match[1];
-    const ext = mime.split('/')[1]?.replace('quicktime', 'mov') || 'bin';
-    const byteChars = atob(match[2]);
-    const byteNumbers = new Uint8Array(byteChars.length);
-    for (let i = 0; i < byteChars.length; i++) {
-      byteNumbers[i] = byteChars.charCodeAt(i);
-    }
-    const blob = new Blob([byteNumbers], { type: mime });
+    const isImage = mime.startsWith('image/');
 
-    // Generate unique filename
+    let blob;
+    let uploadMime = mime;
+    let ext;
+
+    if (isImage) {
+      // Compress image: resize + reduce quality
+      blob = await _compressImage(base64Str, 1200, 0.85);
+      uploadMime = 'image/jpeg';
+      ext = 'jpg';
+    } else {
+      // Video or other files: upload as-is
+      ext = mime.split('/')[1]?.replace('quicktime', 'mov') || 'bin';
+      const byteChars = atob(match[2]);
+      const byteNumbers = new Uint8Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) {
+        byteNumbers[i] = byteChars.charCodeAt(i);
+      }
+      blob = new Blob([byteNumbers], { type: mime });
+    }
+
     const filename = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     const { data, error } = await supabase.storage
       .from('room-media')
-      .upload(filename, blob, { contentType: mime, upsert: false });
+      .upload(filename, blob, { contentType: uploadMime, upsert: false });
 
     if (error) {
       console.error('Upload error:', error);
-      return base64Str; // Fallback: keep base64
+      return base64Str;
     }
 
-    // Get public URL
     const { data: urlData } = supabase.storage
       .from('room-media')
       .getPublicUrl(data.path);
@@ -286,6 +297,48 @@ async function _uploadBase64(base64Str, folder = 'rooms') {
     console.error('Upload failed:', err);
     return base64Str;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Image Compression: resize + JPEG quality reduction
+// 8MB photo → ~150-300KB (90%+ smaller, visually identical on web)
+// ---------------------------------------------------------------------------
+function _compressImage(base64Str, maxWidth = 1200, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      // Calculate new dimensions
+      let w = img.width;
+      let h = img.height;
+      if (w > maxWidth) {
+        h = Math.round(h * (maxWidth / w));
+        w = maxWidth;
+      }
+
+      // Draw on canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Export as compressed JPEG
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            console.log(`Image compressed: ${(base64Str.length * 0.75 / 1024).toFixed(0)}KB → ${(blob.size / 1024).toFixed(0)}KB`);
+            resolve(blob);
+          } else {
+            reject(new Error('Compression failed'));
+          }
+        },
+        'image/jpeg',
+        quality
+      );
+    };
+    img.onerror = () => reject(new Error('Image load failed'));
+    img.src = base64Str;
+  });
 }
 
 // ---------------------------------------------------------------------------
