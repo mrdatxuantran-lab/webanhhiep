@@ -56,7 +56,7 @@ function navigateTo(hash) {
 }
 
 function getRoomCategoryName(cat) {
-  return cat === 'phongthu' ? 'Phòng thuê' : cat === 'duan' ? 'Dự Án' : cat || '';
+  return cat === 'phongthu' ? 'Căn cho thuê' : cat === 'duan' ? 'Căn chuyển nhượng' : cat || '';
 }
 
 function getRoomCategoryIcon(cat) {
@@ -1442,7 +1442,7 @@ async function renderFormUI(room) {
   let defaultTitle = '';
   if (!isEdit) {
     const rooms = await getRooms();
-    const catLabel = formCategory === 'phongthu' ? 'Phòng thuê' : 'Dự Án';
+    const catLabel = formCategory === 'phongthu' ? 'Căn cho thuê' : 'Căn chuyển nhượng';
     const count = rooms.filter(r => (r.roomCategory || '') === formCategory).length;
     defaultTitle = `${catLabel} ${count + 1}`;
   }
@@ -1468,8 +1468,8 @@ async function renderFormUI(room) {
                 <div class="field__input-wrap">
                   <span class="field__icon"><span class="material-symbols-rounded">category</span></span>
                   <select class="field__select" id="room-category">
-                    <option value="phongthu"${formCategory === 'phongthu' ? ' selected' : ''}>Phòng thuê</option>
-                    <option value="duan"${formCategory === 'duan' ? ' selected' : ''}>Dự Án</option>
+                    <option value="phongthu"${formCategory === 'phongthu' ? ' selected' : ''}>Căn cho thuê</option>
+                    <option value="duan"${formCategory === 'duan' ? ' selected' : ''}>Căn chuyển nhượng</option>
                   </select>
                 </div>
               </div>
@@ -1659,7 +1659,7 @@ function bindFormEvents(existingRoom) {
         const titleInput = document.getElementById('room-title');
         if (titleInput) {
           const rooms = await getRooms();
-          const catLabel = cat === 'phongthu' ? 'Phòng thuê' : 'Dự Án';
+          const catLabel = cat === 'phongthu' ? 'Căn cho thuê' : 'Căn chuyển nhượng';
           const count = rooms.filter(r => (r.roomCategory || '') === cat).length;
           titleInput.value = `${catLabel} ${count + 1}`;
         }
