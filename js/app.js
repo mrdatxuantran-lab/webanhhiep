@@ -5,7 +5,7 @@ import {
   initData, getRooms, getRoomById, addRoom, updateRoom, deleteRoom,
   getContactInfo, saveContactInfo, verifyAdmin,
   trackPageView, trackClick, getAnalyticsSummary
-} from './data.js';
+} from './data.js?v=20260624';
 
 // ======================== UTILITIES ========================
 
