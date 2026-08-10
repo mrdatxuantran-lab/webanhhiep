@@ -56,17 +56,21 @@ function _toDB(room) {
 // initData — ensure tables have initial data
 // ---------------------------------------------------------------------------
 export async function initData() {
-  // Migrate localStorage data to Supabase (one-time)
-  await _migrateFromLocalStorage();
+  try {
+    // Migrate localStorage data to Supabase (one-time)
+    await _migrateFromLocalStorage();
 
-  // Check if rooms exist, if not seed sample data
-  const { data: rooms, error } = await supabase
-    .from('rooms')
-    .select('id')
-    .limit(1);
+    // Check if rooms exist, if not seed sample data
+    const { data: rooms, error } = await supabase
+      .from('rooms')
+      .select('id')
+      .limit(1);
 
-  if (!error && (!rooms || rooms.length === 0)) {
-    await _seedSampleRooms();
+    if (!error && (!rooms || rooms.length === 0)) {
+      await _seedSampleRooms();
+    }
+  } catch (err) {
+    console.error('initData error:', err);
   }
 }
 
@@ -138,30 +142,40 @@ async function _migrateFromLocalStorage() {
 // Room CRUD
 // ---------------------------------------------------------------------------
 export async function getRooms() {
-  const { data, error } = await supabase
-    .from('rooms')
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from('rooms')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error('getRooms error:', error);
+    if (error) {
+      console.error('getRooms error:', error);
+      return [];
+    }
+    return (data || []).map(_toJS);
+  } catch (err) {
+    console.error('getRooms exception:', err);
     return [];
   }
-  return (data || []).map(_toJS);
 }
 
 export async function getRoomById(id) {
-  const { data, error } = await supabase
-    .from('rooms')
-    .select('*')
-    .eq('id', Number(id))
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('rooms')
+      .select('*')
+      .eq('id', Number(id))
+      .single();
 
-  if (error) {
-    console.error('getRoomById error:', error);
+    if (error) {
+      console.error('getRoomById error:', error);
+      return null;
+    }
+    return _toJS(data);
+  } catch (err) {
+    console.error('getRoomById exception:', err);
     return null;
   }
-  return _toJS(data);
 }
 
 export async function addRoom(roomData) {
@@ -345,16 +359,21 @@ function _compressImage(base64Str, maxWidth = 1200, quality = 0.85) {
 // Contact Info
 // ---------------------------------------------------------------------------
 export async function getContactInfo() {
-  const { data, error } = await supabase
-    .from('contact')
-    .select('*')
-    .eq('id', 1)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('contact')
+      .select('*')
+      .eq('id', 1)
+      .single();
 
-  if (error || !data) {
+    if (error || !data) {
+      return { name: 'Chủ nhà', phone: '0123456789', zalo: '0123456789' };
+    }
+    return { name: data.name, phone: data.phone, zalo: data.zalo };
+  } catch (err) {
+    console.error('getContactInfo exception:', err);
     return { name: 'Chủ nhà', phone: '0123456789', zalo: '0123456789' };
   }
-  return { name: data.name, phone: data.phone, zalo: data.zalo };
 }
 
 export async function saveContactInfo(info) {

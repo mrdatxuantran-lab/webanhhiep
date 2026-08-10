@@ -5,7 +5,7 @@ import {
   initData, getRooms, getRoomById, addRoom, updateRoom, deleteRoom,
   getContactInfo, saveContactInfo, verifyAdmin,
   trackPageView, trackClick, getAnalyticsSummary
-} from './data.js?v=20260624b';
+} from './data.js?v=20260810';
 
 // ======================== UTILITIES ========================
 
@@ -253,16 +253,17 @@ function renderHome() {
   `;
 
   setTimeout(async () => {
-    const rooms = await getRooms();
-    const activeRooms = rooms.filter(r => !isExpired(r));
-    const contact = await getContactInfo();
+    try {
+      const rooms = (await getRooms()) || [];
+      const activeRooms = rooms.filter(r => !isExpired(r));
+      const contact = await getContactInfo();
 
-    app.innerHTML = `
-      <div class="wrap">
-        <div class="hero">
-          <h1 class="hero__title">Quỹ Căn <span class="text-gradient">Vinhomes</span> Giá Tốt</h1>
-          <p class="hero__subtitle">Mua bán, cho thuê và ký gửi căn hộ Vinhomes Ocean Park.<br>Cập nhật căn thật, giá thật, hỗ trợ xem nhà nhanh và tư vấn miễn phí.</p>
-        </div>
+      app.innerHTML = `
+        <div class="wrap">
+          <div class="hero">
+            <h1 class="hero__title">Quỹ Căn <span class="text-gradient">Vinhomes</span> Giá Tốt</h1>
+            <p class="hero__subtitle">Mua bán, cho thuê và ký gửi căn hộ Vinhomes Ocean Park.<br>Cập nhật căn thật, giá thật, hỗ trợ xem nhà nhanh và tư vấn miễn phí.</p>
+          </div>
 
         <div class="filter-panel">
           <div class="filter-panel__tabs" id="category-tabs">
@@ -380,6 +381,18 @@ function renderHome() {
       document.getElementById('welcome-close').addEventListener('click', closeWelcome);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) closeWelcome(); });
       setTimeout(closeWelcome, 10000);
+    }
+    } catch (err) {
+      console.error('renderHome error:', err);
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = `
+          <div class="wrap" style="text-align:center; padding: 60px 20px;">
+            <h2>⚠️ Không thể kết nối dữ liệu</h2>
+            <p style="margin-top:10px; color:#666;">Vui lòng kiểm tra lại trạng thái Supabase hoặc thử lại sau.</p>
+          </div>
+        `;
+      }
     }
   }, 300);
 }
